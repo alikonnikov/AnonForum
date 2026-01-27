@@ -3,18 +3,18 @@
 @inject Forum.ForumClient ForumClient
 @rendermode InteractiveServer
 
-<PageTitle>Темы обсуждения</PageTitle>
+<PageTitle>Discussion Topics</PageTitle>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Темы обсуждения</h2>
-        <button class="btn btn-success" @onclick="ShowCreateForm">Создать тему</button>
+        <h2>Discussion Topics</h2>
+        <button class="btn btn-success" @onclick="ShowCreateForm">Create Topic</button>
     </div>
 
     <div class="mb-4">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Поиск по темам..." @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearch">
-            <button class="btn btn-outline-secondary" type="button" @onclick="LoadTopics">Найти</button>
+            <input type="text" class="form-control" placeholder="Search topics..." @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearch">
+            <button class="btn btn-outline-secondary" type="button" @onclick="LoadTopics">Search</button>
         </div>
     </div>
 
@@ -22,28 +22,28 @@
     {
         <div class="card mb-4">
             <div class="card-body">
-                <h5 class="card-title">Новая тема</h5>
+                <h5 class="card-title">New Topic</h5>
                 <div class="mb-3">
-                    <label class="form-label">Заголовок</label>
+                    <label class="form-label">Title</label>
                     <input type="text" class="form-control" @bind="newTopicTitle">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Описание</label>
+                    <label class="form-label">Description</label>
                     <textarea class="form-control" @bind="newTopicDescription"></textarea>
                 </div>
-                <button class="btn btn-primary" @onclick="CreateTopic">Сохранить</button>
-                <button class="btn btn-secondary" @onclick="() => showCreateForm = false">Отмена</button>
+                <button class="btn btn-primary" @onclick="CreateTopic">Save</button>
+                <button class="btn btn-secondary" @onclick="() => showCreateForm = false">Cancel</button>
             </div>
         </div>
     }
 
     @if (topics == null)
     {
-        <p><em>Загрузка...</em></p>
+        <p><em>Loading...</em></p>
     }
     else if (!topics.Any())
     {
-        <p>Тем пока нет. Будьте первым!</p>
+        <p>No topics yet. Be the first!</p>
     }
     else
     {
@@ -56,7 +56,7 @@
                         <small>@DateTimeOffset.FromUnixTimeSeconds(topic.CreatedAt).LocalDateTime.ToString("g")</small>
                     </div>
                     <p class="mb-1">@topic.Description</p>
-                    <a href="topic/@topic.Id" class="btn btn-outline-primary btn-sm">Обсудить</a>
+                    <a href="topic/@topic.Id" class="btn btn-outline-primary btn-sm">Discuss</a>
                 </div>
             }
         </div>

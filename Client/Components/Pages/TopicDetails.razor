@@ -3,14 +3,14 @@
 @inject Forum.ForumClient ForumClient
 @rendermode InteractiveServer
 
-<PageTitle>Обсуждение</PageTitle>
+<PageTitle>Discussion</PageTitle>
 
 <div class="container mt-4">
-    <a href="topics" class="btn btn-outline-secondary mb-3">Назад к темам</a>
+    <a href="topics" class="btn btn-outline-secondary mb-3">Back to Topics</a>
 
     @if (topic == null)
     {
-        <p><em>Загрузка темы...</em></p>
+        <p><em>Loading topic...</em></p>
     }
     else
     {
@@ -18,19 +18,19 @@
             <div class="card-body">
                 <h2 class="card-title">@topic.Title</h2>
                 <p class="card-text text-muted">@topic.Description</p>
-                <small class="text-secondary">Создано: @DateTimeOffset.FromUnixTimeSeconds(topic.CreatedAt).LocalDateTime.ToString("g")</small>
+                <small class="text-secondary">Created: @DateTimeOffset.FromUnixTimeSeconds(topic.CreatedAt).LocalDateTime.ToString("g")</small>
             </div>
         </div>
 
-        <h4>Сообщения</h4>
+        <h4>Messages</h4>
         <div class="mb-4">
             @if (messages == null)
             {
-                <p><em>Загрузка сообщений...</em></p>
+                <p><em>Loading messages...</em></p>
             }
             else if (!messages.Any())
             {
-                <p>Сообщений пока нет. Будьте первым!</p>
+                <p>No messages yet. Be the first!</p>
             }
             else
             {
@@ -48,11 +48,11 @@
 
         <div class="card">
             <div class="card-body">
-                <h5>Оставить сообщение</h5>
+                <h5>Leave a message</h5>
                 <div class="mb-3">
-                    <textarea class="form-control" rows="3" @bind="newMessageContent" placeholder="Введите ваше сообщение..."></textarea>
+                    <textarea class="form-control" rows="3" @bind="newMessageContent" placeholder="Enter your message..."></textarea>
                 </div>
-                <button class="btn btn-primary" @onclick="SendMessage" disabled="@string.IsNullOrWhiteSpace(newMessageContent)">Отправить</button>
+                <button class="btn btn-primary" @onclick="SendMessage" disabled="@string.IsNullOrWhiteSpace(newMessageContent)">Send</button>
             </div>
         </div>
     }

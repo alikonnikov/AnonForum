@@ -43,7 +43,7 @@ public class ForumService : Forum.ForumBase
         catch (Exception ex)
         {
             Console.WriteLine($"[DEBUG_LOG] Error in GetTopics: {ex}");
-            throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            throw new RpcException(new Status(StatusCode.Internal, "Internal server error occurred"));
         }
     }
 
@@ -53,7 +53,7 @@ public class ForumService : Forum.ForumBase
         {
             if (!MongoDB.Bson.ObjectId.TryParse(request.Id, out _))
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid Id"));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ID format"));
             }
 
             var topic = await _topics.Find(t => t.Id == request.Id).FirstOrDefaultAsync();
@@ -73,7 +73,7 @@ public class ForumService : Forum.ForumBase
         catch (Exception ex)
         {
             Console.WriteLine($"[DEBUG_LOG] Error in GetTopic: {ex}");
-            throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            throw new RpcException(new Status(StatusCode.Internal, "Internal server error occurred"));
         }
     }
 
@@ -101,7 +101,7 @@ public class ForumService : Forum.ForumBase
         catch (Exception ex)
         {
             Console.WriteLine($"[DEBUG_LOG] Error in CreateTopic: {ex}");
-            throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            throw new RpcException(new Status(StatusCode.Internal, "Internal server error occurred"));
         }
     }
 
@@ -132,7 +132,7 @@ public class ForumService : Forum.ForumBase
         catch (Exception ex)
         {
             Console.WriteLine($"[DEBUG_LOG] Error in GetMessages: {ex}");
-            throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            throw new RpcException(new Status(StatusCode.Internal, "Internal server error occurred"));
         }
     }
 
@@ -142,7 +142,7 @@ public class ForumService : Forum.ForumBase
         {
             if (!MongoDB.Bson.ObjectId.TryParse(request.TopicId, out _))
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid TopicId"));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid topic ID format"));
             }
 
             var message = new Message
@@ -165,7 +165,7 @@ public class ForumService : Forum.ForumBase
         catch (Exception ex)
         {
             Console.WriteLine($"[DEBUG_LOG] Error in SendMessage: {ex}");
-            throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            throw new RpcException(new Status(StatusCode.Internal, "Internal server error occurred"));
         }
     }
 }

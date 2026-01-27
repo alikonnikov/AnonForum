@@ -1,0 +1,110 @@
+﻿@page "/topic/{Id}"
+@using AnonForum.Contracts
+@inject Forum.ForumClient ForumClient
+@rendermode InteractiveServer
+
+<PageTitle>Обсуждение</PageTitle>
+
+<div class="container mt-4">
+    <a href="topics" class="btn btn-outline-secondary mb-3">Назад к темам</a>
+
+    @if (topic == null)
+    {
+        <p><em>Загрузка темы...</em></p>
+    }
+    else
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">@topic.Title</h2>
+                <p class="card-text text-muted">@topic.Description</p>
+                <small class="text-secondary">Создано: @DateTimeOffset.FromUnixTimeSeconds(topic.CreatedAt).LocalDateTime.ToString("g")</small>
+            </div>
+        </div>
+
+        <h4>Сообщения</h4>
+        <div class="mb-4">
+            @if (messages == null)
+            {
+                <p><em>Загрузка сообщений...</em></p>
+            }
+            else if (!messages.Any())
+            {
+                <p>Сообщений пока нет. Будьте первым!</p>
+            }
+            else
+            {
+                @foreach (var msg in messages)
+                {
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <p class="mb-1">@msg.Content</p>
+                            <small class="text-muted">@DateTimeOffset.FromUnixTimeSeconds(msg.CreatedAt).LocalDateTime.ToString("g")</small>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5>Оставить сообщение</h5>
+                <div class="mb-3">
+                    <textarea class="form-control" rows="3" @bind="newMessageContent" placeholder="Введите ваше сообщение..."></textarea>
+                </div>
+                <button class="btn btn-primary" @onclick="SendMessage" disabled="@string.IsNullOrWhiteSpace(newMessageContent)">Отправить</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = null!;
+
+    private Topic? topic;
+    private List<Message>? messages;
+    private string newMessageContent = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            topic = await ForumClient.GetTopicAsync(new GetTopicRequest { Id = Id });
+
+            var messagesResponse = await ForumClient.GetMessagesAsync(new GetMessagesRequest { TopicId = Id });
+            messages = messagesResponse.Messages.ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(newMessageContent)) return;
+
+        try
+        {
+            await ForumClient.SendMessageAsync(new SendMessageRequest
+            {
+                TopicId = Id,
+                Content = newMessageContent
+            });
+
+            newMessageContent = "";
+            var messagesResponse = await ForumClient.GetMessagesAsync(new GetMessagesRequest { TopicId = Id });
+            messages = messagesResponse.Messages.ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}

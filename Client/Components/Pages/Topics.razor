@@ -1,0 +1,112 @@
+﻿@page "/topics"
+@using AnonForum.Contracts
+@inject Forum.ForumClient ForumClient
+@rendermode InteractiveServer
+
+<PageTitle>Темы обсуждения</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Темы обсуждения</h2>
+        <button class="btn btn-success" @onclick="ShowCreateForm">Создать тему</button>
+    </div>
+
+    <div class="mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Поиск по темам..." @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearch">
+            <button class="btn btn-outline-secondary" type="button" @onclick="LoadTopics">Найти</button>
+        </div>
+    </div>
+
+    @if (showCreateForm)
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Новая тема</h5>
+                <div class="mb-3">
+                    <label class="form-label">Заголовок</label>
+                    <input type="text" class="form-control" @bind="newTopicTitle">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Описание</label>
+                    <textarea class="form-control" @bind="newTopicDescription"></textarea>
+                </div>
+                <button class="btn btn-primary" @onclick="CreateTopic">Сохранить</button>
+                <button class="btn btn-secondary" @onclick="() => showCreateForm = false">Отмена</button>
+            </div>
+        </div>
+    }
+
+    @if (topics == null)
+    {
+        <p><em>Загрузка...</em></p>
+    }
+    else if (!topics.Any())
+    {
+        <p>Тем пока нет. Будьте первым!</p>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var topic in topics)
+            {
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-2">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">@topic.Title</h5>
+                        <small>@DateTimeOffset.FromUnixTimeSeconds(topic.CreatedAt).LocalDateTime.ToString("g")</small>
+                    </div>
+                    <p class="mb-1">@topic.Description</p>
+                    <a href="topic/@topic.Id" class="btn btn-outline-primary btn-sm">Обсудить</a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Topic>? topics;
+    private string searchQuery = "";
+    private bool showCreateForm = false;
+    private string newTopicTitle = "";
+    private string newTopicDescription = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTopics();
+    }
+
+    private async Task LoadTopics()
+    {
+        var response = await ForumClient.GetTopicsAsync(new GetTopicsRequest { SearchQuery = searchQuery });
+        topics = response.Topics.ToList();
+    }
+
+    private async Task HandleSearch(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await LoadTopics();
+        }
+    }
+
+    private void ShowCreateForm()
+    {
+        showCreateForm = true;
+    }
+
+    private async Task CreateTopic()
+    {
+        if (string.IsNullOrWhiteSpace(newTopicTitle)) return;
+
+        await ForumClient.CreateTopicAsync(new CreateTopicRequest
+        {
+            Title = newTopicTitle,
+            Description = newTopicDescription
+        });
+
+        newTopicTitle = "";
+        newTopicDescription = "";
+        showCreateForm = false;
+        await LoadTopics();
+    }
+}

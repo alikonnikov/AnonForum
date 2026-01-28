@@ -3,7 +3,8 @@ using Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<IMongoClient>(new MongoClient("mongodb://localhost:27017"));
+var mongoConnectionString = builder.Configuration.GetConnectionString("MongoDb") ?? "mongodb://localhost:27017";
+builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnectionString));
 builder.Services.AddGrpc();
 
 var app = builder.Build();

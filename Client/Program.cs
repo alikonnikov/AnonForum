@@ -9,7 +9,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddGrpcClient<Forum.ForumClient>(o =>
 {
-    o.Address = new Uri("http://localhost:5114"); 
+    var serverUrl = builder.Configuration["ForumServer:Url"] ?? "http://localhost:5114";
+    o.Address = new Uri(serverUrl); 
 });
 var app = builder.Build();
 

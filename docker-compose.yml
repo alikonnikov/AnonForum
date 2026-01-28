@@ -1,0 +1,39 @@
+﻿services:
+  mongodb:
+    image: mongo:latest
+    container_name: forum-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  server:
+    image: anonforum-server
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    container_name: forum-server
+    ports:
+      - "5114:8080"
+    environment:
+      - ConnectionStrings__MongoDb=mongodb://mongodb:27017
+      - ASPNETCORE_HTTP_PORTS=8080
+    depends_on:
+      - mongodb
+
+  client:
+    image: anonforum-client
+    build:
+      context: .
+      dockerfile: Client/Dockerfile
+    container_name: forum-client
+    ports:
+      - "5000:8080"
+    environment:
+      - ForumServer__Url=http://server:8080
+      - ASPNETCORE_HTTP_PORTS=8080
+    depends_on:
+      - server
+
+volumes:
+  mongo-data:
